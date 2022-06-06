@@ -1,0 +1,89 @@
+---
+output: html_document
+#output: github_document
+---
+
+#Lab 8 Group 4
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# clust431
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of clust431 is to provide various methods of clustering in order best group data.
+
+
+
+## Installation
+
+You can install the released version of clust431 from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("clust431")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem of implementing EM clustering on a dataset.
+
+```{r example}
+library(tidyverse)
+library(clust431)
+iris2 <- iris %>%
+    select(Sepal.Length, Sepal.Width)
+em_clust(iris2, 3)
+```
+
+#One Dimension
+```{r, warning = FALSE}
+clusters = as.factor(em_clust(iris$Sepal.Length, 3)$Clusters)
+oneD = data.frame(clusters, iris$Sepal.Length)
+ggplot(oneD, aes(x = iris.Sepal.Length, y = clusters, color = clusters)) + geom_point()
+```
+
+#Two Dimension
+```{r}
+iris3 <- iris2
+em_clust(iris2, 2)
+iris3$clusters <- as.factor(em_clust(iris2, 2)$Clusters)
+ggplot(iris3, aes(x = Sepal.Length, y = Sepal.Width, color = clusters)) + geom_point()
+```
+
+#Four Demensions (groups the species based on the characteristics)
+```{r}
+iris4 <- iris %>%
+    select(-c(Species))
+em_clust(iris4, 3)
+
+iris4$clusters <- em_clust(iris4, 3)$Clusters
+
+ggplot(iris4, aes(x=Sepal.Length, y=Petal.Length, color=as.factor(clusters))) + geom_point(size=2)
+```
+#comparison
+```{r}
+iris %>%
+    count(Species)
+
+iris5 <- iris
+iris5$clusters <- iris4$clusters
+
+ggplot(iris5, aes(x = Species, y = stat(count), fill = as.factor(clusters))) + geom_histogram(stat="count")
+```
+
+
+#Show the cluster probabilities at every iteration for the em_clust algorithm
+```{r}
+em_clust(iris2, 3, show_cluster_probs = T)
+```
+
+
